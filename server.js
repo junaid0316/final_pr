@@ -1,41 +1,31 @@
-const express = require("express");
-const cors = require("cors");
-const morgan = require("morgan");
-const dotenv = require("dotenv");
-const colors = require("colors");
-const path = require("path");
-const connectDb = require("./config/connectDb");
-// config dot env file
-dotenv.config();
+const express = require('express');
+const connectDB = require('./config/db');
+const path = require('path')
 
-//databse call
-connectDb();
-
-//rest object
 const app = express();
 
-//middlewares
-app.use(morgan("dev"));
-app.use(express.json());
-app.use(cors());
+// Connect Database
+connectDB();
 
-//routes
-//user routes
-app.use("/api/v1/users", require("./routes/userRoute"));
-//transections routes
-app.use("/api/v1/transections", require("./routes/transectionRoutes"));
+// Initialize Middleware
+app.use(express.json({ extended: false }))
 
-//static files
+// define routes
+app.use('/api/users', require('./routes/api/users'));
+app.use('/api/customer', require('./routes/api/customer'));
+app.use('/api/auth', require('./routes/api/auth'));
+app.use('/api/property', require('./routes/api/property'));
+app.use('/api/post-file', require('./routes/api/post-file'));
+app.use('/api/inquiry', require('./routes/api/inquiry'));
+app.use('/api/booking', require('./routes/api/booking'));
+
+
 app.use(express.static(path.join(__dirname, "./client/build")));
 
 app.get("*", function (req, res) {
-  res.sendFile(path.join(__dirname, "./client/build/index.html"));
+    res.sendFile(path.join(__dirname, "./client/build/index.html"));
 });
 
-//port
 const PORT = 8080 || process.env.PORT;
 
-//listen server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`App is running on port ${PORT}`));
